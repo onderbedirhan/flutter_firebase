@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_firebase/providers/cloud_firestore_provider.dart';
-import 'package:flutter_firebase/providers/firebase_auth_provider.dart';
-import 'package:flutter_firebase/screens/my_home_page.dart';
-import 'package:provider/provider.dart';
-import 'package:provider/single_child_widget.dart';
+import 'package:flutter_firebase/screens/auth_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_firebase/screens/chat_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,17 +10,28 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: <SingleChildWidget>[
-        ChangeNotifierProvider(create: (context) => FirebaseAuthProvider()),
-        ChangeNotifierProvider(create: (context) => CloudFireStoreProvider()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.green,
-        ),
-        home: MyHomePage(),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+        backgroundColor: Colors.pink,
+        accentColor: Colors.deepPurple,
+        accentColorBrightness: Brightness.dark,
+        buttonTheme: ButtonTheme.of(context).copyWith(
+            buttonColor: Colors.pink,
+            textTheme: ButtonTextTheme.primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            )),
+      ),
+      home: StreamBuilder(
+        stream: FirebaseAuth.instance.onAuthStateChanged,
+        builder: (ctx, userSnapshot) {
+          if (userSnapshot.hasData) {
+            return ChatScreen();
+          }
+          return AuthScreen();
+        },
       ),
     );
   }
